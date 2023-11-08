@@ -1,41 +1,51 @@
 #include <iostream>
 #include <cstring>
 #include "Arduino.h"
+#include "Defines.h"
 #include "Bricks.h"
+#include "Interface.h"
 
 
-#include "eInkBricksRender.h"
 
+#if defined(EINK29IN)
+  #include "eInk29inRenderer.h"
+#elif defined(TFT20IN)
+  #include "TFT20inRenderer.h"
+#elif defined(TFT24IN)
+  #include "DisplayDrivers/TFT24in/BricksRenderer.h"
+#elif defined(TFT35IN)
+  #include "DisplayDrivers/TFT35in/BricksRenderer.h"
+#endif
 
 
 unsigned char table[MAX_Y*MAX_X] = {
-  1,0,0,0,0,0,0,0,0,0,
-  0,1,0,0,0,0,0,0,0,0,
-  0,0,1,0,0,0,0,0,0,0,
-  0,0,0,1,0,0,0,0,0,0,
-  0,0,0,0,1,0,0,0,0,0,
-  0,0,0,0,0,1,0,0,0,0,
-  0,0,0,0,0,0,1,0,0,0,
-  0,0,0,0,0,0,0,1,0,0,
-  0,0,0,0,0,0,0,0,1,0,
-  0,0,0,0,0,0,0,0,0,1,
-  0,0,0,0,0,0,0,0,1,0,
-  0,0,0,0,0,0,0,1,0,0,
-  0,0,0,0,0,0,1,0,0,0,
-  0,0,0,0,0,1,0,0,0,0,
-  0,0,0,0,1,0,0,0,0,0,
-  0,0,0,1,0,0,0,0,0,0,
-  0,0,1,0,0,0,0,0,0,0,
-  0,1,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,1,1,0,0,0,0,0,0,1
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0
 };
 
 unsigned char newItemTable[4*4] = {
-  1,0,0,1,
-  0,1,1,0,
-  0,1,1,0,
-  1,0,0,1
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0
 };
 
 unsigned char tempItemTable[4*4] = {
@@ -46,38 +56,38 @@ unsigned char tempItemTable[4*4] = {
 };
 
 unsigned char itemI[4][8] = {
-  0,1,1,4,2,2,2,2,
-  1,0,4,1,2,2,2,2,
-  0,1,1,4,2,2,2,2,
-  1,0,4,1,2,2,2,2
+  2,0,1,4,2,2,2,2,
+  0,2,4,1,2,2,2,2,
+  2,0,1,4,2,2,2,2,
+  0,2,4,1,2,2,2,2
 };
 
 unsigned char itemLR[4][10] = {
-  1,0,3,2,2,0,2,0,2,2,
+  0,1,3,2,2,0,2,0,2,2,
   1,1,2,3,0,0,2,2,2,2,
   1,1,3,2,2,2,0,2,0,2,
-  0,1,2,3,2,2,2,2,0,0
+  1,0,2,3,2,2,2,2,0,0
 };
 
 unsigned char itemLL[4][10] = {
   1,1,3,2,0,2,0,2,2,2,
-  0,1,2,3,2,2,2,0,0,2,
-  1,0,3,2,2,2,2,0,2,0,
+  1,0,2,3,2,2,2,0,0,2,
+  0,1,3,2,2,2,2,0,2,0,
   1,1,2,3,2,0,0,2,2,2
 };
 
 unsigned char itemZR[4][10] = {
-  0,1,2,3,2,2,0,0,2,2,
-  1,0,3,2,0,2,2,2,2,0,
+  1,0,2,3,2,2,0,0,2,2,
+  0,1,3,2,0,2,2,2,2,0,
   1,1,2,3,2,2,0,0,2,2,
-  1,0,3,2,0,2,2,2,2,0
+  0,1,3,2,0,2,2,2,2,0
 };
 
 unsigned char itemZL[4][10] = {
-  0,1,2,3,0,2,2,2,2,0,
-  0,1,3,2,2,0,2,2,0,2,
-  0,1,2,3,0,2,2,2,2,0,
-  1,0,3,2,2,0,2,2,0,2
+  1,0,2,3,0,2,2,2,2,0,
+  1,0,3,2,2,0,2,2,0,2,
+  1,0,2,3,0,2,2,2,2,0,
+  0,1,3,2,2,0,2,2,0,2
 };
 
 unsigned char itemO[4][8] = {
@@ -90,8 +100,8 @@ unsigned char itemO[4][8] = {
 unsigned char itemT[4][10] = {
   1,1,2,3,0,2,0,2,2,2,
   1,1,3,2,0,2,2,2,0,2,
-  0,1,2,3,2,2,2,0,2,0,
-  1,0,3,2,2,0,2,2,2,0
+  1,0,2,3,2,2,2,0,2,0,
+  0,1,3,2,2,0,2,2,2,0
 };
 
 unsigned char item = 0;
@@ -100,7 +110,7 @@ unsigned char item = 0;
 
 unsigned long score = 0;
 unsigned int lines = 0;
-unsigned char speed = 0;
+unsigned char level = 0;
 
 
 unsigned char currentShape = 0;
@@ -129,6 +139,25 @@ void renderTableIntoSerial(String message,unsigned char *itemToInsert,int column
     }
       
 }
+
+void renderItemTableIntoSerial(String message,unsigned char *itemToInsert)
+{  
+
+   Serial.print("----------------------------\n");
+   Serial.print(String(message + "\n"));
+   Serial.print(String("rows: " + String(itemToInsert[3]) + " columns: " + String(itemToInsert[2]) +"\n"));
+    for(int j = 0; j < itemToInsert[ROW_COUNT_INDEX]; j++)
+    {
+      for(int i = 0; i < itemToInsert[COLUMN_COUNT_INDEX]; i++)
+      {
+        Serial.print(String(String(itemToInsert[MATRIX_START_INDEX +j*itemToInsert[COLUMN_COUNT_INDEX] + i]) + " "));
+      }
+      Serial.print("\n");
+    }
+      
+}
+
+
 
 void copyItemToTable(unsigned int itemInserPositionX, unsigned char *itemToInsert, unsigned char *targetTable, unsigned char columnNum)
 {
@@ -208,8 +237,8 @@ bool isFixedItemCollision(int offsetX, int offsetY, unsigned char shapeCenterX, 
         //    Serial.print(String("      newX: " + String(newX) + "\n"));
             if(newX < 0 || newX >= MAX_X || newY >= MAX_Y || table[newY*MAX_X+newX] == CELL_STATE_FIXED )
             {
-             if( table[newY*MAX_X+newX] == CELL_STATE_FIXED )
-                 Serial.print("Matrix Collission\n"); 
+           //  if( table[newY*MAX_X+newX] == CELL_STATE_FIXED )
+              //   Serial.print("Matrix Collission\n"); 
              return true;
              
             }
@@ -222,11 +251,11 @@ bool isFixedItemCollision(int offsetX, int offsetY, unsigned char shapeCenterX, 
 
 void moveShape(short offsetX, short offsetY)
 {
+  if(isGameOver)
+    return;
    char newCenterItemX = shapeCenterX + offsetX;
    char newCenterItemY = shapeCenterY + offsetY;
 
-   if(isFixedItemCollision(offsetX,offsetY,shapeCenterX,shapeCenterY,currentShape,currentRotation))
-    return;
    //renderTableIntoSerial(" moveShape before change",table,MAX_X);
    unsigned char *shapeWithRotation = toShapeWithRotation(currentShape,currentRotation);
 
@@ -258,25 +287,31 @@ void rotateShape()
     
     if(isFixedItemCollision(0,0,shapeCenterX,shapeCenterY,currentShape,newRotation))
         return;
-
+  
 	unsigned char *shapeWithRotation = toShapeWithRotation(currentShape, currentRotation);
+
+  //renderItemTableIntoSerial("Before rotation",shapeWithRotation);
 	currentRotation = newRotation;
 	unsigned char *newShapeWithRotation = toShapeWithRotation(currentShape, currentRotation);
+  //renderItemTableIntoSerial("After rotation",newShapeWithRotation);
 
-	for (unsigned char j = 0; j < shapeWithRotation[COLUMN_COUNT_INDEX]; j++)
-		for (unsigned char i = 0; i < shapeWithRotation[ROW_COUNT_INDEX]; i++)
+
+	for (unsigned char j = 0; j < shapeWithRotation[ROW_COUNT_INDEX]; j++)
+		for (unsigned char i = 0; i < shapeWithRotation[COLUMN_COUNT_INDEX]; i++)
 		{
 			if (shapeWithRotation[MATRIX_START_INDEX + j*shapeWithRotation[COLUMN_COUNT_INDEX]  + i] == CELL_STATE_MOVING)
 				table[(shapeCenterY + (j - shapeWithRotation[SHAPE_CENTER_Y_INDEX]))*MAX_X + (shapeCenterX + (i - shapeWithRotation[SHAPE_CENTER_X_INDEX]))] = CELL_STATE_EMPTY;
 		}
-	for (unsigned char j = 0; j < shapeWithRotation[COLUMN_COUNT_INDEX]; j++)
-		for (unsigned char i = 0; i < shapeWithRotation[ROW_COUNT_INDEX]; i++)
+
+   
+	for (unsigned char j = 0; j < newShapeWithRotation[ROW_COUNT_INDEX]; j++)
+		for (unsigned char i = 0; i < newShapeWithRotation[COLUMN_COUNT_INDEX]; i++)
 		{
-			if (shapeWithRotation[MATRIX_START_INDEX + j*shapeWithRotation[COLUMN_COUNT_INDEX] + i] == CELL_STATE_MOVING)
-				table[(shapeCenterY + (j - shapeWithRotation[SHAPE_CENTER_Y_INDEX]))*MAX_X + (shapeCenterX + (i - shapeWithRotation[SHAPE_CENTER_X_INDEX]))] = CELL_STATE_MOVING;
+			if (newShapeWithRotation[MATRIX_START_INDEX + j*newShapeWithRotation[COLUMN_COUNT_INDEX] + i] == CELL_STATE_MOVING)
+				table[(shapeCenterY + (j - newShapeWithRotation[SHAPE_CENTER_Y_INDEX]))*MAX_X + (shapeCenterX + (i - newShapeWithRotation[SHAPE_CENTER_X_INDEX]))] = CELL_STATE_MOVING;
 		}
 
-     renderPlayField(table,MAX_Y,MAX_X);
+  renderPlayField(table,MAX_Y,MAX_X);
 }
 
 void moveItemLeft()
@@ -300,6 +335,9 @@ void moveItemRight()
 void moveItemDown()
 {
 
+  if(isGameOver)
+    return;
+
 	if (isFixedItemCollision(0, 1, shapeCenterX, shapeCenterY, currentShape, currentRotation))
 	{
         changeStateFromMovingToFixed(currentShape,currentRotation);      
@@ -322,13 +360,14 @@ void moveItemDown()
   
         copyItemToTable(0, newShapeWithRotation, newItemTable, 4 );
         renderPlayField(table,MAX_Y,MAX_X);
-        renderNextItemField(newItemTable,4,4);
+        renderNextItemField(newItemTable,4);
+        refreshStats(lines,score,level);
         return;
                   
-  }
-   
+  }else   
     moveShape(0,1);   
-  
+    
+
 }
 
 
@@ -341,7 +380,7 @@ void changeStateFromMovingToFixed(unsigned char shape, unsigned char rotation)
 			if (shapeWithRotation[MATRIX_START_INDEX + j*shapeWithRotation[COLUMN_COUNT_INDEX] + i] == CELL_STATE_MOVING)
 				table[(shapeCenterY + (j - shapeWithRotation[SHAPE_CENTER_Y_INDEX]))*MAX_X + (shapeCenterX + (i - shapeWithRotation[SHAPE_CENTER_X_INDEX]))] = CELL_STATE_FIXED;
 		}
-   
+   findCompleteLinesRemoveAddCountScore() ;
  //  renderTableIntoSerial("changeStateFromMovingToFixed after change",table,MAX_X);
 }
 
@@ -372,36 +411,50 @@ void increaseScoreForLinesAndSpeed(unsigned char linesCompleted)
 	}
 
 	score = score + scoreIncrease;
-	speed = (unsigned char)(score / 10000);
-	if (speed < 1)
-		speed = 1;
+	level = (unsigned char)(score / 10000)+1;
+	if (level < 1)
+		level = 1; 
 }
-
-void findCompleteLinesRemoveAddCountScore() 
+int getLevel()
 {
-	unsigned char targetLineIndex = 0;
-	unsigned char tableWithRemovedCompletedLines[20][10] = {};
+   return level;  
+}
+void findCompleteLinesRemoveAddCountScore() 
+{ 
+  unsigned char targetLineIndex = MAX_Y-1;
+	unsigned char tableWithRemovedCompletedLines[200] = {};
 	int linesCompleted = 0;
-
-	for (unsigned char j = MAX_Y - 1; j >= 0; j--)
+Serial.println("After init");
+	for (short j = (MAX_Y - 1); j >= 0; j--)
 	{
+  Serial.println("j " + String(j));
 		bool isLineCompleted = true;
-		for (unsigned char i = 0; i < MAX_X; i++)
+		for (short i = 0; i < MAX_X; i++)
 		{
 			isLineCompleted = isLineCompleted && (table[j*MAX_X + i] == CELL_STATE_FIXED);
 			if (!isLineCompleted)
 				break;
+		}
 			if (isLineCompleted)
 				linesCompleted++;
 			else
 			{				
-				for (unsigned char k = 0; k < MAX_X; k++)
-					tableWithRemovedCompletedLines[targetLineIndex][i] = table[j*MAX_X + i];
-				targetLineIndex++;
+				for (short k = 0; k < MAX_X; k++)
+					tableWithRemovedCompletedLines[targetLineIndex*MAX_X+k] = table[j*MAX_X + k];
+				targetLineIndex--;
 			}
 
-		}
 	}
+if(linesCompleted > 0)
+   for(short q = 0; q < MAX_Y;q++)
+     for(short r =0; r< MAX_X;r++)
+     {
+      table[q*MAX_X+r] = tableWithRemovedCompletedLines[q*MAX_X+r];
+     }
+     
+//	renderTableIntoSerial("Removed lines table",tableWithRemovedCompletedLines,MAX_X);
+// renderTableIntoSerial("table",table,MAX_X);
+ //Serial.println("Lines completed " + String(linesCompleted));
 	increaseScoreForLinesAndSpeed(linesCompleted);	
 
 }
@@ -414,7 +467,7 @@ void resetGame()
    
 	lines = 0;
 	score = 0;
-	speed = 1;
+	level = 1;
 
 	clearNewItemField();
 	unsigned char *newShapeWithRotation = generateNewItem();
@@ -429,10 +482,140 @@ void resetGame()
 	newShapeWithRotation = generateNewItem();
 
   copyItemToTable(0,  newShapeWithRotation, newItemTable, 4);
-
-  isGameOver = false;
  
+  isGameOver = false;
+
+  initFrameBuffer();
   renderPlayField(table,MAX_Y,MAX_X);
-  renderNextItemField(newItemTable,4,4);
-  refreshStats(lines, score, speed);
+  renderNextItemField(newItemTable,4);
+  refreshStats(lines, score, level);
 }
+
+void initDisplay()
+{
+  initFrameBuffer();
+}
+
+void renderDisplay()
+{
+  renderFrameBuffer();
+}
+
+void leftButtonClick()
+{
+  moveItemLeft();
+}
+
+void rightButtonClick()
+{
+  moveItemRight();
+}
+
+void downButtonClick()
+{
+  moveItemDown();
+}
+
+void upButtonClick()
+{
+  //rotateShape();
+}
+
+void action1ButtonClick()
+{
+  rotateShape();
+}
+
+void resetButtonClick()
+{
+  resetGame();  
+}
+
+void selectButtonClick()
+{}
+
+void action2ButtonClick()
+{
+  //rotateShape();
+}
+
+void leftUpButtonClick()
+{
+  moveItemLeft();  
+}
+
+void leftDownButtonClick()
+{
+  moveItemLeft();
+  moveItemDown();
+}
+void rightUpButtonClick()
+{
+  moveItemRight();  
+}
+void rightDownButtonClick()
+{
+  moveItemRight();
+  moveItemDown();
+}
+
+void leftAction1ButtonClick()
+{
+  moveItemLeft();
+  rotateShape();  
+}
+void leftAction2ButtonClick()
+{
+  moveItemLeft();
+  rotateShape();
+}
+
+void rightAction1ButtonClick()
+{
+  moveItemRight();
+  rotateShape();
+}
+
+void rightAction2ButtonClick()
+{
+  moveItemRight();
+  rotateShape();
+}
+
+void upAction1ButtonClick()
+{
+  rotateShape();
+}
+
+void upAction2ButtonClick()
+{
+  rotateShape();
+}
+
+void downAction1ButtonClick()
+{
+  moveItemDown();
+  rotateShape();
+}
+
+void downAction2ButtonClick()
+{
+  moveItemDown();
+  rotateShape();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  

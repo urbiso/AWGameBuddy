@@ -4,29 +4,29 @@
 #define COLORED     0
 #define UNCOLORED   1
 
-const unsigned char SHAPE_CENTER_X_INDEX = 0;
-const unsigned char SHAPE_CENTER_Y_INDEX = 1;
-const unsigned char ROW_COUNT_INDEX = 2;
-const unsigned char COLUMN_COUNT_INDEX = 3;
-const unsigned char MATRIX_START_INDEX = 4;
+#define SHAPE_CENTER_X_INDEX  0
+#define SHAPE_CENTER_Y_INDEX  1
+#define ROW_COUNT_INDEX       2
+#define COLUMN_COUNT_INDEX    3
+#define MATRIX_START_INDEX    4
 
-const unsigned char SHAPE_LL = 0;
-const unsigned char SHAPE_LR = 1;
-const unsigned char SHAPE_ZL = 2;
-const unsigned char SHAPE_ZR = 3;
-const unsigned char SHAPE_I = 4;
-const unsigned char SHAPE_O = 5;
-const unsigned char SHAPE_T = 6;
+#define SHAPE_LL 0
+#define SHAPE_LR 1
+#define SHAPE_ZL 2
+#define SHAPE_ZR 3
+#define SHAPE_I  4
+#define SHAPE_O  5
+#define SHAPE_T  6
 
-const unsigned char CELL_STATE_EMPTY = 0;
-const unsigned char CELL_STATE_FIXED = 1;
-const unsigned char CELL_STATE_MOVING = 2;
+#define CELL_STATE_EMPTY   0
+#define CELL_STATE_FIXED   1
+#define CELL_STATE_MOVING  2
 
-const unsigned char FIRST_ROTATION = 0;
-const unsigned char LAST_ROTATION = 3;
+#define FIRST_ROTATION  0
+#define LAST_ROTATION   3
 
-const unsigned char MAX_X = 10;
-const unsigned char MAX_Y = 20;
+#define MAX_X  10
+#define MAX_Y  20
 
 void copyItemToTable(unsigned int itemInserPositionX, unsigned char *itemToInsert, unsigned char *targetTable, unsigned char columnNum); 
 void clearNewItemField();
@@ -44,6 +44,12 @@ void increaseScoreForLinesAndSpeed(unsigned char linesCompleted);
 void findCompleteLinesRemoveAddCountScore();
 void resetGame();
 void setRandomSeed(long randomSeed);
+void initDisplay();
+void renderDisplay();
+void renderTableIntoSerial(String message,unsigned char *itemToInsert,int columns);
+int getLevel();
+
+
 
 
 #endif

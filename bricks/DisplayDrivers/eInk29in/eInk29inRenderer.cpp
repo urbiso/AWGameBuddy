@@ -3,15 +3,14 @@
 #include "epdpaint.h"
 #include "imagedata.h"
 #include "Bricks.h"
-#include "eInkBricksRender.h"
-
+#include "eInk29inRenderer.h"
 
 
 unsigned char image[4736];
 Paint paint(image, 0, 0);    // width should be the multiple of 8 
 Epd epd;
  
-void initDisplay(){
+void initFrameBuffer(){
 
 
   if (epd.Init(lut_full_update) != 0) {

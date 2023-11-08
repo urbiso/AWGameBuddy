@@ -1,4 +1,4 @@
-#ifndef BRICKS_RENDER
+#if !defined(BRICKS_RENDER)
 #define BRICKS_RENDER
 	void renderCell(unsigned char j, unsigned char i);
 	void renderTable();
