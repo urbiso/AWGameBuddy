@@ -3,7 +3,7 @@
 #include "epd2in9.h"
 #include "epdpaint.h"
 #include "imagedata.h"
-#include "Tetris.h"
+#include "Bricks.h"
 
 #define COLORED     0
 #define UNCOLORED   1

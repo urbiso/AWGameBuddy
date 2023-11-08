@@ -1,5 +1,5 @@
-#ifndef TETRIS
-#define TETRIS
+#ifndef BRICKS
+#define BRICKS
 
 const unsigned char SHAPE_CENTER_X_INDEX = 0;
 const unsigned char SHAPE_CENTER_Y_INDEX = 1;

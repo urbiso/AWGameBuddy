@@ -2,7 +2,7 @@
 #include <cstring>
 #include <stdlib.h>
 
-#include "Tetris.h"
+#include "Bricks.h"
 
 
 unsigned char table[MAX_Y][MAX_X] = {

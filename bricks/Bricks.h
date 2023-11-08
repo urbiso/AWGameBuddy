@@ -1,5 +1,5 @@
-#ifndef TETRIS
-#define TETRIS
+#ifndef BRICKS
+#define BRICKS
 
 #define COLORED     0
 #define UNCOLORED   1

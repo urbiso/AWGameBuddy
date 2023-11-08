@@ -1,10 +1,10 @@
 #include <iostream>
 #include <cstring>
 #include "Arduino.h"
-#include "Tetris.h"
+#include "Bricks.h"
 
 
-#include "eInkTetrisRender.h"
+#include "eInkBricksRender.h"
 
 
 
