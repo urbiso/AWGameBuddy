@@ -1,4 +1,4 @@
-AWGameBuddy
+# AWGameBuddy
 Open source DYI game console with complete models’ history and source code.
 Current version utilizes ESP8266 microcontroller with 2.9-inch color display.
 Communication is handled via SPI interface.
